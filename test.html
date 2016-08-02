@@ -35,7 +35,20 @@ p{
 
 var txt=document.getElementById("txt");
    var set={
-   
+   changeColor:function(){
+        txt.style.color="red";
+        txt.style.backgroundColor="#ccc";
+    },//定义"改变颜色"的函数
+    changeSize:function(){
+        txt.style.height="300px";
+        txt.style.width="300px";
+    },//定义"改变宽高"的函数
+    hideContent:function(){
+        txt.style.display="none";
+    },//定义"隐藏内容"的函数
+    showContent:function(){
+        txt.style.display="block";
+    },//定义"显示内容"的函数
     offSet:function(){
         var message=confirm("你确定要重置所有设置么？");
         if(message==true){
