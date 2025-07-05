@@ -1,0 +1,119 @@
+.posts-list {
+  flex: 1 1 auto;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.posts-scroll-wrapper {
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  height: 100%;
+}
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+  padding-top: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+  box-sizing: border-box;
+}
+@media (max-width: 1200px) {
+  .posts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+@media (max-width: 700px) {
+  .posts-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
+@media (max-width: 900px) {
+  .post-card {
+    min-width: 140px;
+    max-width: 180px;
+    flex: 0 0 140px;
+  }
+  .posts-grid {
+    gap: 12px;
+  }
+}
+.post-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 32px 12px 24px 12px;
+  transition: box-shadow 0.18s, transform 0.15s, border 0.18s;
+  border: 1.5px solid #e5e5e5;
+  cursor: pointer;
+  color: #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  min-width: 0;
+  max-width: unset;
+  flex: unset;
+}
+.post-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+  border: 1.5px solid #222;
+  transform: translateY(-3px) scale(1.03);
+}
+.post-card-date {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  pointer-events: none;
+  z-index: 2;
+}
+.post-date {
+  font-size: 0.82rem;
+  color: #888;
+  font-weight: 400;
+  text-align: left;
+}
+.post-card-title {
+  flex: 1 1 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+}
+.post-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111;
+  text-align: center;
+  word-break: break-all;
+  text-decoration: none !important;
+}
+.post-card-title * {
+  text-decoration: none !important;
+}
+.empty-tip {
+  color: #aaa;
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.1rem;
+} 

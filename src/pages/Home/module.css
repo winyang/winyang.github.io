@@ -1,189 +1,37 @@
-<template>
-  <div class="home-layout">
-    <aside class="sidebar">
-      <div class="search-box">
-        <input v-model="search" type="text" placeholder="Search..." />
-      </div>
-      <div class="category-box">
-        <div
-          v-for="cat in categories"
-          :key="cat"
-          :class="['category-item', { active: cat === selectedCategory }]"
-          @click="selectCategory(cat)"
-        >
-          {{ cat }} <span class="cat-count">({{ categoryCount[cat] || 0 }})</span>
-        </div>
-      </div>
-    </aside>
-    <div class="content-area">
-      <div v-if="!selectedPost" class="posts-list">
-        <div
-          v-for="post in filteredPosts"
-          :key="post.id"
-          class="post-card clickable"
-          @click="selectPost(post)"
-        >
-          <div class="post-title">{{ post.title }}</div>
-          <div class="post-date">{{ post.date }}</div>
-        </div>
-        <div v-if="filteredPosts.length === 0" class="empty-tip">暂无文章</div>
-      </div>
-      <div v-else class="article-panel">
-        <div class="post-header">
-          <h1 class="post-title">{{ selectedPost.title }}</h1>
-          <div class="post-date">{{ selectedPost.date }}</div>
-        </div>
-        <div class="post-body" v-html="renderedContent"></div>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { marked } from 'marked'
-import hljs from 'highlight.js'
-import 'highlight.js/styles/github-dark.css'
-
-const modules = import.meta.glob('@/posts/*/*.md', { query: '?raw', import: 'default', eager: true })
-const posts = ref([])
-const categories = ref([])
-const selectedCategory = ref('')
-const search = ref('')
-const categoryCount = ref({})
-const selectedPost = ref(null)
-const renderedContent = ref('')
-
-
-async function loadCategoriesAndPosts() {
-  const arr = []
-  const countMap = {}
-  for (const path in modules) {
-    const content = modules[path]
-    const match = content.match(/^# (.+)/)
-    const title = match ? match[1] : '未命名'
-    const catMatch = path.match(/posts\/(.*?)\//)
-    const category = catMatch ? catMatch[1] : '未分类'
-    const dateMatch = path.match(/(\d{4}-\d{2}-\d{2})/)
-    const date = dateMatch ? dateMatch[1] : ''
-    const idMatch = path.match(/posts\/.*?\/(.+)\.md$/)
-    const id = idMatch ? idMatch[1] : ''
-    
-    arr.push({ id, title, date, category })
-    countMap[category] = (countMap[category] || 0) + 1
-  }
-  let allCats = []
-  try {
-    const res = await fetch('/src/categories.json')
-    if (res.ok) {
-      allCats = await res.json()
-    }
-  } catch (e) {}
-  allCats.forEach(cat => {
-    if (!(cat in countMap)) countMap[cat] = 0
-  })
-  categories.value = allCats.length ? allCats : Object.keys(countMap)
-  posts.value = arr.sort((a, b) => b.date.localeCompare(a.date))
-  categoryCount.value = countMap
-  
-  if (!selectedCategory.value && categories.value.length > 0) {
-    selectedCategory.value = categories.value[0]
-  }
+:global(html, body) {
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
-onMounted(loadCategoriesAndPosts)
-
-
-
-function selectCategory(cat) {
-  selectedCategory.value = cat
-  // 切换分类时，清空选中的文章，显示文章列表
-  selectedPost.value = null
-  renderedContent.value = ''
-}
-
-function selectPost(post) {
-  selectedPost.value = post
-  // 加载文章内容
-  const postPath = `/src/posts/${post.category}/${post.id}.md`
-  
-  if (modules[postPath]) {
-    const content = modules[postPath]
-    // 移除标题行，因为标题已经在头部显示了
-    const contentWithoutTitle = content.replace(/^# .+$/m, '')
-    renderedContent.value = marked(contentWithoutTitle)
-    
-    // 在下一个 tick 中重新高亮代码块
-    setTimeout(() => {
-      const codeBlocks = document.querySelectorAll('.post-body pre code')
-      codeBlocks.forEach(block => {
-        // 移除之前的高亮标记
-        block.removeAttribute('data-highlighted')
-        block.className = block.className.replace(/hljs language-\w+/, '')
-        // 重新高亮
-        hljs.highlightElement(block)
-      })
-    }, 0)
-  }
-}
-
-const filteredPosts = computed(() => {
-  if (!selectedCategory.value) return []
-  
-  let list = posts.value.filter(post => post.category === selectedCategory.value)
-  
-  if (search.value.trim()) {
-    list = list.filter(post => post.title.toLowerCase().includes(search.value.trim().toLowerCase()))
-  }
-  
-  return list
-})
-
-watch(categories, (newCats) => {
-  if (!selectedCategory.value && newCats.length > 0) {
-    selectedCategory.value = newCats[0]
-  }
-})
-
-marked.setOptions({
-  highlight: function(code, lang) {
-    // 清理代码，移除多余的空格和换行
-    const cleanCode = code.trim()
-    
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return hljs.highlight(cleanCode, { language: lang }).value
-      } catch (e) {
-        return hljs.escape(cleanCode)
-      }
-    }
-    
-    // 对于没有指定语言的代码块，尝试自动检测语言
-    try {
-      const result = hljs.highlightAuto(cleanCode)
-      return result.value
-    } catch (e) {
-      // 如果自动检测失败，返回原始代码
-      return hljs.escape(cleanCode)
-    }
-  }
-})
-</script>
-
-<style scoped>
-.home-layout {
-  display: flex;
-  max-width: 1200px;
+.main-container {
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 32px 12px 0 12px;
-  gap: 28px;
-  align-items: flex-start;
-  color: #222;
-  font-family: 'PT Sans', 'Helvetica Neue', Arial, sans-serif;
-  background: #f7f7f7;
+  background: #f7fafc;
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(66,185,131,0.10);
+  padding: 0 0 0 0;
+  height: 97vh;
+  min-height: 97vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
+
+.home-layout {
+  display: grid;
+  grid-template-columns: 2fr 8fr;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  gap: 0;
+}
+
 .sidebar {
-  width: 220px;
+  grid-column: 1 / 2;
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
@@ -194,7 +42,43 @@ marked.setOptions({
   align-items: stretch;
   padding: 22px 14px 14px 14px;
   color: #222;
+  position: sticky;
+  top: 24px;
+  z-index: 10;
 }
+
+.content-area {
+  grid-column: 2 / 3;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.article-panel, .posts-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.article-panel .post-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.posts-list {
+  flex: 1 1 auto;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .search-box {
   margin-bottom: 18px;
   margin-top: 8px;
@@ -253,10 +137,6 @@ marked.setOptions({
   color: #aaa;
   margin-left: 6px;
 }
-.content-area {
-  flex: 1;
-  color: #222;
-}
 
 .post-title {
   font-size: 1.18rem;
@@ -278,9 +158,13 @@ marked.setOptions({
 }
 
 .post-content {
-  color: #444;
-  font-size: 1rem;
-  line-height: 1.6;
+  flex: 1 1 auto;
+  min-height: 0;
+  color: #181818;
+  font-size: 1.13rem;
+  line-height: 1.85;
+  word-break: break-word;
+  font-family: 'PT Sans', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .post-content h1, .post-content h2, .post-content h3, .post-content h4, .post-content h5, .post-content h6 {
@@ -385,6 +269,10 @@ marked.setOptions({
   line-height: 1.7;
 }
 @media (max-width: 900px) {
+  .main-container {
+    border-radius: 10px;
+    padding: 8px 0 24px 0;
+  }
   .home-layout {
     flex-direction: column;
     gap: 14px;
@@ -409,37 +297,113 @@ marked.setOptions({
   color: #c7254e;
 }
 
-
-
 .posts-list {
+  min-height: 500px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
 .post-card {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  padding: 16px 18px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 12px 12px;
   transition: box-shadow 0.18s, transform 0.15s, border 0.18s;
-  border: 1px solid #e5e5e5;
+  border: 1.5px solid #e5e5e5;
   cursor: pointer;
   color: #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  aspect-ratio: 1 / 1;
 }
 
 .post-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  border: 1px solid #222;
-  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+  border: 1.5px solid #222;
+  transform: translateY(-3px) scale(1.03);
+}
+
+.posts-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(66,185,131,0.08);
+  border: 1.5px solid #e5e5e5;
+  padding: 32px 24px 32px 24px;
+  margin-bottom: 0px;
+  position: relative;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.posts-list-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.pagination-wrapper-fixed {
+  flex-shrink: 0;
+  margin-top: 12px;
+  min-height: 36px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: none;
+  box-shadow: none;
+  position: static;
+  width: 100%;
+  z-index: 1;
+}
+
+.pagination {
+  padding: 2px 0;
+  gap: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.page-btn {
+  min-width: 56px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+
+.page-info {
+  font-size: 0.85rem;
+  min-width: 36px;
 }
 
 .article-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.07);
   padding: 24px;
   border: 1.5px solid #e5e5e5;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 .post-content {
@@ -455,10 +419,6 @@ marked.setOptions({
   padding-bottom: 16px;
   border-bottom: 1px solid #e5e5e5;
 }
-
-
-
-
 
 .post-header .post-title {
   font-size: 1.8rem;
@@ -576,7 +536,6 @@ marked.setOptions({
   font-weight: normal;
 }
 
-/* 纯黑底主题的语法高亮颜色 */
 .post-body .hljs-keyword {
   color: #ff6b6b;
 }
@@ -720,4 +679,95 @@ marked.setOptions({
 .post-body td {
   color: #4a5568;
 }
-</style>
+
+@media (max-width: 1200px) {
+  .home-layout {
+    max-width: 98vw;
+    padding: 12px 2vw 0 2vw;
+    gap: 12px;
+  }
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    padding: 10px 4px 6px 4px;
+  }
+  .content-area {
+    min-height: 600px;
+    padding-bottom: 40px;
+  }
+  .posts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .post-card {
+    min-height: 100px;
+    padding: 12px 4px;
+    font-size: 0.98rem;
+  }
+}
+@media (max-width: 700px) {
+  .home-layout {
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px 1vw 0 1vw;
+  }
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    padding: 6px 2px 4px 2px;
+  }
+  .content-area {
+    min-height: 400px;
+    padding-bottom: 32px;
+  }
+  .posts-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .post-card {
+    min-height: 70px;
+    padding: 8px 2px;
+    font-size: 0.92rem;
+  }
+  .pagination-wrapper {
+    min-height: 28px;
+  }
+  .pagination {
+    gap: 4px;
+  }
+  .page-btn {
+    min-width: 36px;
+    padding: 2px 4px;
+    font-size: 0.78rem;
+    border-radius: 4px;
+  }
+  .page-info {
+    font-size: 0.78rem;
+    min-width: 20px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .posts-area {
+    padding: 16px 6px 48px 6px;
+    max-width: 98vw;
+  }
+}
+@media (max-width: 700px) {
+  .posts-area {
+    padding: 6px 2px 32px 2px;
+    border-radius: 10px;
+  }
+}
+
+.markdown-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  font-size: 1.08rem;
+  line-height: 1.8;
+  color: #222;
+  background: none;
+  padding: 0;
+  height: auto;
+  overflow: visible;
+} 
