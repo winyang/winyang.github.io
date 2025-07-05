@@ -10,8 +10,6 @@ export function usePostPage() {
   const content = ref('')
   const title = ref('')
 
-  // 文章列表和分类相关
-  const modules = import.meta.glob('./posts/*/*.md', { query: '?raw', import: 'default', eager: true })
   const posts = ref([])
   const categories = ref([])
   const selectedCategory = ref('')
@@ -19,32 +17,19 @@ export function usePostPage() {
   const categoryCount = ref({})
 
   async function loadCategoriesAndPosts() {
-    const arr = []
-    const countMap = {}
-    for (const path in modules) {
-      const content = modules[path]
-      const match = content.match(/^# (.+)/)
-      const title = match ? match[1] : '未命名'
-      const catMatch = path.match(/posts\/(.*?)\//)
-      const category = catMatch ? catMatch[1] : '未分类'
-      const dateMatch = path.match(/(\d{4}-\d{2}-\d{2})/)
-      const date = dateMatch ? dateMatch[1] : ''
-      const idMatch = path.match(/posts\/.*?\/(.+)\.md$/)
-      const id = idMatch ? idMatch[1] : ''
-      arr.push({ id, title, date, category })
-      countMap[category] = (countMap[category] || 0) + 1
-    }
-    let allCats = []
+    let arr = []
     try {
-      const res = await fetch('/src/categories.json')
+      const res = await fetch('/posts.index.json')
       if (res.ok) {
-        allCats = await res.json()
+        arr = await res.json()
       }
     } catch (e) {}
-    allCats.forEach(cat => {
-      if (!(cat in countMap)) countMap[cat] = 0
+    const countMap = {}
+    arr.forEach(post => {
+      countMap[post.category] = (countMap[post.category] || 0) + 1
     })
-    categories.value = allCats.length ? allCats : Object.keys(countMap)
+    const allCats = Array.from(new Set(arr.map(post => post.category)))
+    categories.value = allCats
     posts.value = arr.sort((a, b) => b.date.localeCompare(a.date))
     categoryCount.value = countMap
     if (!selectedCategory.value && categories.value.length > 0) {
@@ -81,23 +66,24 @@ export function usePostPage() {
 
   async function loadPost() {
     const { category, id } = route.params
-    let mdPath = ''
+    let postMeta = null
     if (category && id) {
-      mdPath = `/src/posts/${category}/${id}.md`
+      postMeta = posts.value.find(p => p.category === category && p.id === id)
     } else if (id) {
-      mdPath = `/src/posts/${id}.md`
+      postMeta = posts.value.find(p => p.id === id)
     }
-    if (!mdPath) {
+    if (!postMeta) {
       content.value = '<p>文章未找到</p>'
       title.value = '404 Not Found'
       return
     }
+    let mdPath = `/posts/${postMeta.path.replace(/^posts\//, '')}`
     try {
       const res = await fetch(mdPath)
       if (res.ok) {
         let md = await res.text()
         const match = md.match(/^#\s+(.+)/)
-        title.value = match ? match[1] : '文章详情'
+        title.value = match ? match[1] : postMeta.title
         if (match) {
           md = md.replace(/^#\s+(.+)\n?/, '')
         }
@@ -112,7 +98,6 @@ export function usePostPage() {
     }
   }
 
-  // 切换分类或搜索时，点击文章跳转详情
   function goToPost(post) {
     router.push(`/post/${post.category}/${post.id}`)
   }

@@ -139,7 +139,7 @@
 }
 
 .post-title {
-  font-size: 1.18rem;
+  font-size: 0.98rem;
   font-weight: 700;
   margin-bottom: 8px;
   color: #111;
@@ -325,6 +325,7 @@
   justify-content: center;
   min-height: 140px;
   aspect-ratio: 1 / 1;
+  font-size: 0.96rem;
 }
 
 .post-card:hover {

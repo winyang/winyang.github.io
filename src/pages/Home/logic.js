@@ -4,7 +4,6 @@ import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
 
 export function useHome() {
-  const modules = import.meta.glob('@/posts/*/*.md', { query: '?raw', import: 'default', eager: true })
   const posts = ref([])
   const categories = ref([])
   const selectedCategory = ref('')
@@ -16,32 +15,19 @@ export function useHome() {
   const pageSize = 12
 
   async function loadCategoriesAndPosts() {
-    const arr = []
-    const countMap = {}
-    for (const path in modules) {
-      const content = modules[path]
-      const match = content.match(/^# (.+)/)
-      const title = match ? match[1] : '未命名'
-      const catMatch = path.match(/posts\/(.*?)\//)
-      const category = catMatch ? catMatch[1] : '未分类'
-      const dateMatch = path.match(/(\d{4}-\d{2}-\d{2})/)
-      const date = dateMatch ? dateMatch[1] : ''
-      const idMatch = path.match(/posts\/.*?\/(.+)\.md$/)
-      const id = idMatch ? idMatch[1] : ''
-      arr.push({ id, title, date, category })
-      countMap[category] = (countMap[category] || 0) + 1
-    }
-    let allCats = []
+    let arr = []
     try {
-      const res = await fetch('/src/categories.json')
+      const res = await fetch('/posts.index.json')
       if (res.ok) {
-        allCats = await res.json()
+        arr = await res.json()
       }
     } catch (e) {}
-    allCats.forEach(cat => {
-      if (!(cat in countMap)) countMap[cat] = 0
+    const countMap = {}
+    arr.forEach(post => {
+      countMap[post.category] = (countMap[post.category] || 0) + 1
     })
-    categories.value = allCats.length ? allCats : Object.keys(countMap)
+    const allCats = Array.from(new Set(arr.map(post => post.category)))
+    categories.value = allCats
     posts.value = arr.sort((a, b) => b.date.localeCompare(a.date))
     categoryCount.value = countMap
     if (!selectedCategory.value && categories.value.length > 0) {
@@ -56,27 +42,43 @@ export function useHome() {
     selectedPost.value = null
     selectedPostDetail.value = null
     currentPage.value = 1
+    search.value = ''
   }
 
-  function selectPost(post) {
+  async function selectPost(post) {
     selectedPost.value = post
-    const postPath = `/src/posts/${post.category}/${post.id}.md`
-    if (modules[postPath]) {
-      const content = modules[postPath]
-      const contentWithoutTitle = content.replace(/^# .+$/m, '')
-      const html = marked(contentWithoutTitle)
-      selectedPostDetail.value = {
-        ...post,
-        html
+    // 动态 fetch 资源
+    let mdPath = `/posts/${post.path.replace(/^posts\//, '')}`
+    try {
+      const res = await fetch(mdPath)
+      if (res.ok) {
+        let md = await res.text()
+        // 提取标题
+        const match = md.match(/^#\s+(.+)/)
+        const title = match ? match[1] : '文章详情'
+        if (match) {
+          md = md.replace(/^#\s+(.+)\n?/, '')
+        }
+        const html = marked(md)
+        selectedPostDetail.value = {
+          ...post,
+          title,
+          html,
+          date: post.date
+        }
+        setTimeout(() => {
+          const codeBlocks = document.querySelectorAll('.post-body pre code, .markdown-body pre code')
+          codeBlocks.forEach(block => {
+            block.removeAttribute('data-highlighted')
+            block.className = block.className.replace(/hljs language-\w+/, '')
+            hljs.highlightElement(block)
+          })
+        }, 0)
+      } else {
+        selectedPostDetail.value = { ...post, title: '404 Not Found', html: '<p>文章未找到</p>' }
       }
-      setTimeout(() => {
-        const codeBlocks = document.querySelectorAll('.post-body pre code, .markdown-body pre code')
-        codeBlocks.forEach(block => {
-          block.removeAttribute('data-highlighted')
-          block.className = block.className.replace(/hljs language-\w+/, '')
-          hljs.highlightElement(block)
-        })
-      }, 0)
+    } catch (e) {
+      selectedPostDetail.value = { ...post, title: '404 Not Found', html: '<p>文章未找到</p>' }
     }
   }
 
