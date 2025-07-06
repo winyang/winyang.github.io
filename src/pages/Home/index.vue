@@ -5,16 +5,12 @@
         <div class="search-box">
           <input v-model="search" type="text" placeholder="Search..." />
         </div>
-        <div class="category-box">
-          <div
-            v-for="cat in categories"
-            :key="cat"
-            :class="['category-item', { active: cat === selectedCategory }]"
-            @click="selectCategory(cat)"
-          >
-            {{ cat }} <span class="cat-count">({{ categoryCount[cat] || 0 }})</span>
-          </div>
-        </div>
+        <CategoryBox 
+          :categories="categories" 
+          :selectedCategory="selectedCategory" 
+          :categoryCount="categoryCount"
+          @select="selectCategory"
+        />
       </aside>
       <div class="content-area">
         <div v-if="!selectedPost" class="posts-area">
@@ -33,6 +29,7 @@
 <script setup>
 import PostsGrid from '@/components/PostsGrid/index.vue'
 import PostDetail from '@/components/PostDetail/index.vue'
+import CategoryBox from '@/components/CategoryBox/index.vue'
 import { useHome } from './logic.js'
 import './module.css'
 

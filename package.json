@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "npm run sync-posts && vite",
+    "build": "npm run sync-posts && vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist",
+    "sync-posts": "node scripts/sync-posts.js"
   },
   "dependencies": {
     "highlight.js": "^11.11.1",

@@ -7,6 +7,20 @@
     "path": "posts/1.Learn/2025-07-04-备份策略.md"
   },
   {
+    "id": "神烦警探",
+    "title": "神烦警探",
+    "date": "2025-07-06",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-07-06-神烦警探.md"
+  },
+  {
+    "id": "Vue学习计划",
+    "title": "Vue 前端零基础学习计划（每日 2 小时）",
+    "date": "2025-07-07",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-07-07-Vue学习计划.md"
+  },
+  {
     "id": "我的测试",
     "title": "我的测试我的测试我的测试我",
     "date": "2025-07-04",
