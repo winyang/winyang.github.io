@@ -799,13 +799,55 @@
 .markdown-body table {
   table-layout: fixed;
   width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 24px 0;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(66,185,131,0.08);
 }
 
-.markdown-body th,
-.markdown-body td {
+.markdown-body th, .markdown-body td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1.5px solid #e5e5e5;
   word-wrap: break-word;
   word-break: break-word;
   overflow-wrap: break-word;
+  font-size: 1.02rem;
+}
+
+.markdown-body th {
+  background: linear-gradient(90deg, #f7fafc 60%, #e3f9f1 100%);
+  font-weight: 700;
+  color: #2d3748;
+  border-bottom: 2.5px solid #42b983;
+  letter-spacing: 0.5px;
+}
+
+.markdown-body tr {
+  transition: background 0.2s;
+}
+
+.markdown-body tbody tr:nth-child(odd) {
+  background: #f8fafb;
+}
+
+.markdown-body tbody tr:nth-child(even) {
+  background: #f3f7f6;
+}
+
+.markdown-body tbody tr:hover {
+  background: #e6f7ee;
+}
+
+.markdown-body td:last-child, .markdown-body th:last-child {
+  border-right: none;
+}
+
+.markdown-body td:first-child, .markdown-body th:first-child {
+  border-left: none;
 }
 
 @media (max-width: 500px) {

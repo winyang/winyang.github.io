@@ -8,7 +8,7 @@
         @click="$emit('select', post)"
       >
         <div class="post-card-date"><span class="post-date">{{ post.date }}</span></div>
-        <div class="post-card-title"><span class="post-title">{{ post.title.length > 10 ? post.title.slice(0, 10) + '…' : post.title }}</span></div>
+        <div class="post-card-title"><span class="post-title">{{ post.title.length > 30 ? post.title.slice(0, 30) + '…' : post.title }}</span></div>
       </div>
     </div>
     <div v-if="posts.length === 0" class="empty-tip">暂无文章</div>
