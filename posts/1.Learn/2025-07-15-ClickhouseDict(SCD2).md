@@ -1,8 +1,7 @@
 # ClickhouseDict(SCD2)
 
-https://clickhouse.com/docs/sql-reference/dictionaries#range_hashed
 
-
+https://clickhouse.com/docs/sql-reference/dictionaries
 
 ```
 --Example: The table contains discounts for each advertiser in the format:
@@ -27,4 +26,8 @@ RANGE(MIN discount_start_date MAX discount_end_date)
 
 --Query example: This function returns the value for the specified ids and the date range that includes the passed date.
 SELECT dictGet('discounts_dict', 'amount', 1, '2022-10-20'::Date);
+
+--key word
+range_hashed
+refreshing-dictionary-data-using-lifetime
 ```
