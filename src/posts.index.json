@@ -35,6 +35,34 @@
     "path": "posts/1.Learn/2025-07-15-ClickhouseDict(SCD2).md"
   },
   {
+    "id": "mysql数据恢复",
+    "title": "容器内mysql数据恢复",
+    "date": "2025-07-21",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-07-21-mysql数据恢复.md"
+  },
+  {
+    "id": "规则连接分组问题",
+    "title": "规则连接分组问题",
+    "date": "2025-07-21",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-07-21-规则连接分组问题.md"
+  },
+  {
+    "id": "Clickhouse(PartialUpdate)-Todo",
+    "title": "Clickhouse(PartialUpdate)-Todo",
+    "date": "2025-08-05",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-08-05-Clickhouse(PartialUpdate)-Todo.md"
+  },
+  {
+    "id": "Clickhouse(更新和删除)",
+    "title": "Clickhouse(更新和删除)",
+    "date": "2025-08-05",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-08-05-Clickhouse(更新和删除).md"
+  },
+  {
     "id": "我的测试",
     "title": "我的测试我的测试我的测试我",
     "date": "2025-07-04",
