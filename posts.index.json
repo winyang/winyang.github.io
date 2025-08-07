@@ -42,11 +42,11 @@
     "path": "posts/1.Learn/2025-07-21-mysql数据恢复.md"
   },
   {
-    "id": "规则连接分组问题",
-    "title": "规则连接分组问题",
+    "id": "规则连接分组问题(1)",
+    "title": "规则连接分组问题(1)",
     "date": "2025-07-21",
     "category": "1.Learn",
-    "path": "posts/1.Learn/2025-07-21-规则连接分组问题.md"
+    "path": "posts/1.Learn/2025-07-21-规则连接分组问题(1).md"
   },
   {
     "id": "Clickhouse(PartialUpdate)-Todo",
@@ -61,6 +61,13 @@
     "date": "2025-08-05",
     "category": "1.Learn",
     "path": "posts/1.Learn/2025-08-05-Clickhouse(更新和删除).md"
+  },
+  {
+    "id": "规则连接分组问题(2)",
+    "title": "规则连接分组问题(2)",
+    "date": "2025-08-07",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-08-07-规则连接分组问题(2).md"
   },
   {
     "id": "我的测试",
