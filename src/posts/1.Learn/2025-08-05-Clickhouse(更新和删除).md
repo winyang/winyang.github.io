@@ -26,6 +26,14 @@ patch part 只含有以下部分
 2.定位原数据中行对应位置的元数据
 ```
 
+#### Clickhouse(PartialUpdate)
+
+https://mp.weixin.qq.com/s/so5lpHGCbi3GB8qfNSUPrQ 
+
+```
+CoalescingMergeTree
+```
+
 #### ClickHouse fast
 ```
 Inserts are fast. Merges are continuous. Parts are immutable and sorted.
@@ -39,3 +47,4 @@ Since the engine is already merging data parts in the background, it now applies
 Patch parts slide in instantly with minimal impact on query performance.
 Updates show up right away, with not-yet-merged patches applied in a way that preserves parallelism.
 ```
+
