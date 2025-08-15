@@ -84,6 +84,27 @@
     "path": "posts/1.Learn/2025-08-09-树与图结构.md"
   },
   {
+    "id": "join性能",
+    "title": "join 性能",
+    "date": "2025-08-12",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-08-12-join性能.md"
+  },
+  {
+    "id": "一般性思考",
+    "title": "一般性思考",
+    "date": "2025-08-12",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-08-12-一般性思考.md"
+  },
+  {
+    "id": "任务调度",
+    "title": "任务调度",
+    "date": "2025-08-15",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-08-15-任务调度.md"
+  },
+  {
     "id": "我的测试",
     "title": "我的测试我的测试我的测试我",
     "date": "2025-07-04",
