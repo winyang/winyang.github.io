@@ -112,6 +112,20 @@
     "path": "posts/1.Learn/2025-08-15-任务调度.md"
   },
   {
+    "id": "Paimon",
+    "title": "Paimon",
+    "date": "2025-08-16",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-08-16-Paimon.md"
+  },
+  {
+    "id": "流架构",
+    "title": "流架构",
+    "date": "2025-08-16",
+    "category": "1.Learn",
+    "path": "posts/1.Learn/2025-08-16-流架构.md"
+  },
+  {
     "id": "我的测试",
     "title": "我的测试我的测试我的测试我",
     "date": "2025-07-04",
